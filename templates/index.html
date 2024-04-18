@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database App</title>
+    <style>
+        body {
+            background-image: url('/static/download.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        form {
+            width: 300px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<center><h1>Student Data management App</h1></center>
+
+<form action="/add" method="post">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="roll">Roll Number:</label>
+    <input type="text" id="roll" name="roll" required><br><br>
+
+    <label for="branch">Branch:</label>
+    <select id="branch" name="branch" required>
+        <option value="select Branch">select branch</option>>
+        <option value="CSE">Computer Science Engineering</option>
+        <option value="IT">Information Technology</option>
+        <option value="ECE">Electronics and Communication Engineering</option>
+        <option value="EEE">Electrical and Electronics Engineering</option>
+        <option value="MECH">Mechanical Engineering</option>
+        <option value="CIVIL">Civil Engineering</option>
+        <option value="CHEM">Chemical Engineering</option>
+        <option value="AERO">Aerospace Engineering</option>
+        <option value="BIOTECH">Biotechnology</option>
+        <option value="MATH">Mathematics</option>
+        <option value="PHYS">Physics</option>
+    </select><br><br>
+
+    <label for="college">College Name:</label>
+    <input type="text" id="college" name="college" required><br><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <input type="submit" value="Add">
+</form>
+
+<a href="/display"><button>Display Data</button></a>
+
+</body>
+</html>

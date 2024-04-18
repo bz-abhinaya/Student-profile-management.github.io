@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Data</title>
+    <style>
+        body {
+            background-image: url('/static/download.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: white;
+        }
+        form {
+            max-width: 500px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <center><h1>Update Data</h1></center>
+    <form action="/update/{{ data[0] }}" method="post">
+        <label for="name">Name:</label>
+        <input type="text" name="name" value="{{ data[1] }}" required>
+
+        <label for="roll">Roll Number:</label>
+        <input type="text" name="roll" value="{{ data[2] }}" required>
+
+        <label for="branch">Branch:</label>
+        <input type="text" name="branch" value="{{ data[3] }}" required>
+        <!-- <select name="branch" required>
+            <option value="CSE">Computer Science Engineering</option>
+            <option value="IT">Information Technology</option>
+            <option value="ECE">Electronics and Communication Engineering</option>
+            <option value="EEE">Electrical and Electronics Engineering</option>
+            <option value="MECH">Mechanical Engineering</option>
+            <option value="CIVIL">Civil Engineering</option>
+            <option value="CHEM">Chemical Engineering</option>
+            <option value="AERO">Aerospace Engineering</option>
+            <option value="BIOTECH">Biotechnology</option>
+            <option value="MATH">Mathematics</option>
+            <option value="PHYS">Physics</option>
+        </select> -->
+
+        <label for="college">College Name:</label>
+        <input type="text" name="college" value="{{ data[4] }}" required>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" value="{{ data[5] }}" required>
+        <br><br>
+        <center><button type="submit">Update Data</button></center>
+    </form>
+</body>
+</html>
