@@ -1,30 +1,14 @@
-// {
-//     "version": 2,
-//     "builds": [
-//         {"src": "app.py", "use": "@vercel/python"}
-//     ],
-//     "routes": [
-//         {"src": "/(.*)", "dest": "app.py"}
-//     ]
-// }
-
 {
-    "builds": [
-      {
-        "src": "vercel_app/wsgi.py",
-        "use": "@vercel/python",
-        "config": { "maxLambdaSize": "15mb", "runtime": "python3.10" }
-      }
+    "builds":[
+        {
+            "src":"app.py",
+            "use":"@vercel/python"
+        }
     ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "vercel_app/wsgi.py"
-      }
+    "routes":[
+        {
+            "src":"/(.*)",
+            "dest":"app.py"
+        }
     ]
-}
-{
-    "engines": {
-      "node": "18.x"
-    }
 }
