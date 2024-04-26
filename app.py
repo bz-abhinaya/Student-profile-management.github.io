@@ -1,5 +1,7 @@
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+import pandas as pd
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
@@ -13,7 +15,6 @@ def connect_to_db(db_name):
     except sqlite3.Error as e:
         print(f"Error connecting to database: {e}")
     return conn
-
 
 def create_table(conn):
     create_table_sql = """
@@ -34,7 +35,6 @@ def create_table(conn):
     except sqlite3.Error as e:
         print(f"Error creating table: {e}")
 
-
 def insert_data(conn, name, roll, branch, college, email):
     insert_data_sql = """
     INSERT INTO users (name, roll, branch, college, email) VALUES (?, ?, ?, ?, ?);
@@ -47,18 +47,19 @@ def insert_data(conn, name, roll, branch, college, email):
     except sqlite3.Error as e:
         flash(f"Error inserting data: {e}", "danger")
 
-def fetch_data(conn):
-    fetch_data_sql = """
-    SELECT * FROM users;
-    """
-    try:
-        cursor = conn.cursor()
-        cursor.execute(fetch_data_sql)
-        rows = cursor.fetchall()
-        print("Fetched rows:", rows) 
-        return rows
-    except sqlite3.Error as e:
-        print(f"Error fetching data: {e}")
+def fetch_data(conn, page, per_page=5):
+    cursor = conn.cursor()
+    offset = (page - 1) * per_page
+    cursor.execute(f"SELECT * FROM users LIMIT ? OFFSET ?", (per_page, offset))
+    data = cursor.fetchall()
+    return data
+
+def search_data(conn, search_query, page, per_page=5):
+    cursor = conn.cursor()
+    offset = (page - 1) * per_page
+    cursor.execute(f"SELECT * FROM users WHERE name LIKE ? LIMIT ? OFFSET ?", ('%' + search_query + '%', per_page, offset))
+    data = cursor.fetchall()
+    return data
 
 def fetch_one_data(conn, id):
     fetch_one_data_sql = """
@@ -71,6 +72,18 @@ def fetch_one_data(conn, id):
         return row
     except sqlite3.Error as e:
         print(f"Error fetching data: {e}")
+
+def count_records(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users")
+    count = cursor.fetchone()[0]
+    return count
+
+def get_total_pages(conn, per_page):
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users")
+    total_records = cursor.fetchone()[0]
+    return -(-total_records // per_page)
 
 @app.route('/')
 def index():
@@ -93,54 +106,25 @@ def add_data():
     
     return redirect(url_for('index'))
 
-
-def display_data(conn):
-    select_data_sql = """
-    SELECT * FROM users;
-    """
-    try:
-        cursor = conn.cursor()
-        cursor.execute(select_data_sql)
-        rows = cursor.fetchall()
-        
-        if rows:
-            data_list = []
-            for row in rows:
-                data_list.append({
-                    "id": row[0],
-                    "name": row[1],
-                    "email": row[2]
-                })
-            return data_list
-        else:
-            return None
-    except sqlite3.Error as e:
-        flash(f"Error retrieving data: {e}", "danger")
-
-def delete_data(conn, user_id):
-    delete_data_sql = """
-    DELETE FROM users WHERE id = ?;
-    """
-    try:
-        cursor = conn.cursor()
-        cursor.execute(delete_data_sql, (user_id,))
-        conn.commit()
-        flash("Data deleted successfully!", "success")
-    except sqlite3.Error as e:
-        flash(f"Error deleting data: {e}", "danger")
-
-
-
-@app.route('/display')
-def display_data():
+@app.route('/display', methods=['GET', 'POST'])
+@app.route('/display/<int:page>', methods=['GET', 'POST'])
+def display_data(page=1):
     db_name = "mydatabase.db"
     conn = connect_to_db(db_name)
     
     if conn is not None:
-        data = fetch_data(conn)
-        print("Data to display:", data)
+        search_query = request.form.get('search_query', '')
+        
+        if search_query:
+            data = search_data(conn, search_query, page)
+            total_pages = get_total_pages(conn, 5)
+        else:
+            per_page = 5
+            data = fetch_data(conn, page, per_page)
+            total_pages = get_total_pages(conn, per_page)
+        
         conn.close()
-        return render_template('display.html', data=data)
+        return render_template('display.html', data=data, page=page, total_pages=total_pages, search_query=search_query)
     else:
         flash("Unable to connect to database", "danger")
         return redirect(url_for('index'))
@@ -203,5 +187,15 @@ def update_data(id):
         flash("Unable to connect to database", "danger")
         return redirect(url_for('display_data'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/download')
+def download_data():
+    conn = sqlite3.connect('mydatabase.db')
+    df = pd.read_sql_query("SELECT * FROM users", conn)
+    df.columns = [col.upper() for col in df.columns]
+    csv_data = df.to_csv(index=False)
+    output = BytesIO()
+    output.write(csv_data.encode('utf-8'))
+    output.seek(0)
+    return send_file(output, as_attachment=True, download_name='database.csv', mimetype='text/csv')
+
+
